@@ -11,11 +11,13 @@ class CSVnormalizer(normalizer):
         self.normalized_data = self.data
 
     def readInputFile(self, inputFileName: str) -> None:
+        '''read input csv file into data structure'''
         with codecs_open(inputFileName, 'r', encoding='utf-8', errors='replace') as f:
             self.data = list(DictReader(f))
         return
 
     def writeOutputFile(self, outputFileName: str) -> None:
+        '''Writes normalized_data out to csv file specified by function input name'''
         key_order = (
             'Timestamp',
             'Address',
@@ -34,46 +36,51 @@ class CSVnormalizer(normalizer):
 
     def normalize(self, inputFileName: str, outputFileName: str):
         '''reads input csv file and writes out a normalized format csv file'''
-        
         self.readInputFile(inputFileName)
-        self.normalized_data = self.data
+        self.normalized_data = list()
 
-        for i, entry in enumerate(self.normalized_data):
+        for i, entry in enumerate(self.data):
+            skip_row = False
             for key, value in entry.items():
-                match key:
-                    case 'Timestamp':
-                        entry[key] = self.normalize_timestamp(value)
-                    case 'ZIP':
-                        entry[key] = self.normalize_zipcode(value)
-                    case 'FullName':
-                        entry[key] = self.normalize_fullname(value)
-                    case 'FooDuration' | 'BarDuration':
-                        entry[key] = self.normalize_duration(value)
-                    case 'TotalDuration':
-                        entry[key] = self.normalize_totalDuration(entry['FooDuration'], entry['BarDuration'])
-            self.normalized_data[i] = entry
+                try:
+                    match key:
+                        case 'Timestamp':
+                            entry[key] = self.normalize_timestamp(value)
+                        case 'ZIP':
+                            entry[key] = self.normalize_zipcode(value)
+                        case 'FullName':
+                            entry[key] = self.normalize_fullname(value)
+                        case 'FooDuration' | 'BarDuration':
+                            entry[key] = self.normalize_duration(value)
+                        case 'TotalDuration':
+                            entry[key] = self.normalize_totalDuration(entry['FooDuration'], entry['BarDuration'])
+                except ValueError:
+                    sys.stderr.write(f'Invalid data, skipping row {i+1}.')
+                    skip_row = True
+                    break
+            if not skip_row:
+                self.normalized_data.append(entry)
 
         self.writeOutputFile(outputFileName)
 
 def main():
-    print()
-    inputName = os.path.join('test','sample.csv')
-    outputName = os.path.join('test','sample_out.csv')
-    
+    if not len(sys.argv) > 1:
+        sys.exit('No input file provided')
+
     for i, arg in enumerate(sys.argv):
         if i == 0:
             continue
         elif i == 1:
-            inputName = sys.argv[i]
+            inputName = arg
             split_inputName = os.path.splitext(inputName)
-            outputName = split_inputName[0] + '_out' + split_inputName[1]
+            outputName = split_inputName[0] + '_norm' + split_inputName[1]
         elif i == 2:
-            outputName = sys.argv[i]
+            outputName = arg
 
     norm = CSVnormalizer()
     norm.normalize(inputName, outputName)
 
-    print('end...')
+    print(f'\nNormalized file {outputName!r} created')
 
 
 if __name__ == '__main__':

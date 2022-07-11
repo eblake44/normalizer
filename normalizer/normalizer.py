@@ -3,9 +3,6 @@ from datetime import datetime
 
 class normalizer():
     def normalize_timestamp(self, timestamp: str) -> str:
-        pst = timezone('US/Pacific')
-        est = timezone('US/Eastern')
-
         timestamp_spilt = timestamp.split()
 
         date = timestamp_spilt[0]
@@ -24,10 +21,9 @@ class normalizer():
         if timestamp_spilt[2] == 'PM' and hour < 12:
             hour += 12
 
-        dt = datetime(year, month, day, hour, minute, second, milisecond, tzinfo=pst)
+        dt = datetime(year, month, day, hour, minute, second, milisecond, tzinfo=timezone('US/Pacific'))
 
-        # print(timestamp,'        ',dt.astimezone(est).isoformat('T'))
-        return dt.astimezone(est).isoformat('T')
+        return dt.astimezone(timezone('US/Eastern')).isoformat('T')
 
     def normalize_zipcode(self, zipcode: str) -> str:
         padding = '0' * (5 - len(zipcode))
