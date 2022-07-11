@@ -27,4 +27,4 @@ pipenv shell
 ```
 python ./normalizer/CSVnormalizer.py <input_file_name> [output_file_name]
 ```
-- `output_file_name` is an optional input argument. If only an `input_file_name` is supplied, the output file name will be the same as the `input_file_name` with "_norm" appended to it.
+- `output_file_name` is an optional input argument. If only an `input_file_name` is supplied, the output file name will be the same as the `input_file_name` but it will have "_norm" appended to it.
