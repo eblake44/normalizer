@@ -1,6 +1,5 @@
 import sys
 import os
-from codecs import open as codecs_open
 from csv import DictReader, DictWriter
 from normalizer import normalizer
 
@@ -12,7 +11,7 @@ class CSVnormalizer(normalizer):
 
     def readInputFile(self, inputFileName: str) -> None:
         '''read input csv file into data structure'''
-        with codecs_open(inputFileName, 'r', encoding='utf-8', errors='replace') as f:
+        with open(inputFileName, 'r', encoding='utf-8', errors='replace', newline='') as f:
             self.data = list(DictReader(f))
         return
 
@@ -28,7 +27,7 @@ class CSVnormalizer(normalizer):
             'TotalDuration',
             'Notes',
         )
-        with codecs_open(outputFileName, 'w', encoding='utf-8') as f:
+        with open(outputFileName, 'w', encoding='utf-8', newline='') as f:
             writer = DictWriter(f, fieldnames=key_order)
             writer.writeheader()
             writer.writerows(self.normalized_data)
